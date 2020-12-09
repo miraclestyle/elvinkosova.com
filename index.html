@@ -1,0 +1,104 @@
+<html>
+	<head>
+	  <meta charset="UTF-8">
+		<title>Elvin Kosova Photography</title>
+		<meta name="application-name" content="Elvin Kosova Photography">
+		<link rel="icon" type="image/x-icon" ng-href="favicon.ico">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script type="text/javascript">
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-18884168-1']);
+		  _gaq.push(['_trackPageview']);
+		  
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+	  </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+		<script>
+		  var ekp_json_url = 'https://https://github.com/miraclestyle/elvinkosova.com/ekp.json';
+		</script>
+		<script>
+		  $.fn.extend({ekpSlider: function() {
+		    function Slide(cfg) {
+		      var element = cfg['element'];
+		      var scroller = element.find('#scroller');
+		      scroller.css('visibility', 'visible');
+		      var slides = element.find('#scroller .slide');
+		      function resize() {
+		        var scroller_width = 0;
+		        var height = $(window).height(); // Max height for the image
+		        slides.each(function(index, item) {
+		          var image = $(item).find('img');
+		          var ch = image.data('ch');
+		          var cw = image.data('cw');
+		          var width = parseInt(cw * (height / ch));
+		          scroller_width += width + 4;
+		          $(item).width(width);
+		          $(item).height(height);
+		          image.height(height);
+		          image.width(width);
+		        });
+		        scroller.width(scroller_width);
+		      }
+		      resize();
+		      function expose(total) {
+		        scroller.find('.image:not(".exposed")').slice(0, total).addClass('exposed').each(function(index, item) {
+		          $(item).attr('src', $(item).data('src'));
+		          $(item).show("fade");
+		        });
+		      }
+		      expose(4);
+		      $(window).resize(resize);
+		      var time2 = null;
+		      $(window).bind('scroll', function() {
+		        if (time2) {
+		          return;
+		        }
+		        time2 = setTimeout(function() {
+		          expose(4);
+		          time2 = null;
+		        }, 200);
+		      });
+		    }
+		    return $(this).each(function(index, item) {
+		      $(item).data('slide', new Slide({'element': $(item)}));
+		    });
+		  }});
+		  
+			$(function() {
+			  $.ajax({
+			    dataType: 'json',
+			    url: ekp_json_url,
+			    error: function() {
+			      $('#case #scroller').html('Something went wrong, please reload the page.');
+			    },
+			    success: function(data) {
+			      var slides = [];
+			      $.each(data.items, function(index, item) {
+			        var src = item['src'];
+			        if (index > 5) {
+			          src = 'data:image/gif;base64,R0lGODlhAQABAJH/AP///wAAAP///wAAACH/C0FET0JFOklSMS4wAt7tACH5BAEAAAIALAAAAAABAAEAAAICVAEAOw==';
+			        }
+			        var slide = '<div class="slide" style="float: left; position: relative; padding: 0 2px;"><img data-cw="'+item['width']+'" data-ch="'+item['height']+'" class="image" data-src="'+item['src']+'" src="'+src+'" unselectable="on" style="-webkit-user-select: none;"></div>';
+			        slides.push(slide);
+			      });
+			      $('#case #scroller').html(slides.join(""));
+			      $('#case').ekpSlider();
+			      $(window).trigger('resize');
+			    }
+			  });
+			});
+		</script>
+	</head>
+	<body style="margin: 0; padding: 0; background: black; overflow-y: hidden; overflow-x: scroll;">
+		<div id="case" style="width: 100%; height: 100%;">
+		  <div id="scroller" style="width: 0px; visibility: hidden; overflow: hidden;">
+		  </div>
+		</div>
+	</body>
+</html>
